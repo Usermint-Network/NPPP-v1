@@ -1,6 +1,6 @@
 # NPPP v1 — Notarization Proof Packet Protocol
 
-Deterministic proof. Verifiable integrity. Minimal trust.
+**Deterministic proof. Verifiable integrity. Minimal trust.**
 
 NPPP (Notarization Proof Packet Protocol) is a lightweight protocol for generating, storing, and verifying cryptographic proof of data integrity.
 
@@ -8,30 +8,28 @@ NPPP (Notarization Proof Packet Protocol) is a lightweight protocol for generati
 
 ## What NPPP Does
 
-- Submit data for notarization
-- Receive a deterministic proof string
-- Retrieve proof metadata
-- Replay verification at any time
+- Submit data for notarization  
+- Receive a deterministic proof string  
+- Retrieve proof metadata  
+- Replay verification at any time  
 
 ---
 
 ## Base URL
-
-https://api.usermint.network
+https://api.usermint.network⁠�
 
 ---
 
 ## Authentication
-
-Authorization: Bearer <TOKEN>
+Authorization: Bearer 
 
 ---
 
 ## Core Endpoints
 
-POST /v1/notarize  
-POST /v1/verify  
-GET /v1/proof/{proof_id}
+- `POST /v1/notarize`  
+- `POST /v1/verify`  
+- `GET /v1/proof/{proof_id}`  
 
 ---
 
@@ -50,7 +48,7 @@ GET /v1/proof/{proof_id}
 }
 Typical Flow
 Submit → /v1/notarize
-Get proof
+Receive proof
 Verify → /v1/verify
 Lookup → /v1/proof/{proof_id}
 Philosophy
