@@ -16,12 +16,12 @@ NPPP (Notarization Proof Packet Protocol) is a lightweight protocol for generati
 ---
 
 ## Base URL
-https://api.usermint.network⁠�
+https://api.usermint.network⁠
 
 ---
 
 ## Authentication
-Authorization: Bearer 
+Authorization: Bearer <TOKEN>
 
 ---
 
@@ -46,14 +46,37 @@ Authorization: Bearer
     "path": "."
   }
 }
-Typical Flow
-Submit → /v1/notarize
-Receive proof
-Verify → /v1/verify
-Lookup → /v1/proof/{proof_id}
-Philosophy
-If a system can deterministically reconstruct the input and reproduce the hash, the proof holds.
-Status
-NPPP v1 — Pre-Launch
+```
+
+### Verify
+
+```json
+{
+  "proof": "NPPP:V1|project=...|..."
+}
+```
+
+### Proof Lookup
+
+`GET /v1/proof/{proof_id}`
 
 ---
+
+## Typical Flow
+
+1.  **Submit** → `/v1/notarize`
+2.  **Receive proof**
+3.  **Verify** → `/v1/verify`
+4.  **Lookup** → `/v1/proof/{proof_id}`
+
+---
+
+## Philosophy
+
+If a system can deterministically reconstruct the input and reproduce the hash, the proof holds.
+
+---
+
+## Status
+
+**NPPP v1 — Pre-Launch**
