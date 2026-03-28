@@ -1,0 +1,27 @@
+sequenceDiagram
+    participant Client as Client Layer
+    participant API as NPPP API
+    participant Canon as Canonicalization Engine
+    participant Bundle as Evidence Bundle Builder
+    participant Hash as SHA-256 Hash Engine
+    participant Proof as Proof Constructor
+    participant GCS as GCS Evidence Storage
+    participant Ledger as Proof Ledger Database
+    participant Replay as Replay Engine
+
+    Client->>API: Submit artifact for notarization
+    API->>Canon: Canonicalize artifact
+    Canon->>Bundle: Build deterministic evidence bundle
+    Bundle->>Hash: Compute SHA-256
+    Hash->>Proof: Construct NPPP proof string
+    Proof->>GCS: Store evidence bundle
+    Proof->>Ledger: Record proof metadata
+    Proof-->>Client: Return proof string + metadata
+
+    Client->>API: Submit proof for verification
+    API->>Replay: Start replay verification
+    Replay->>GCS: Retrieve bundle
+    Replay->>Hash: Recompute SHA-256
+    Hash-->>Replay: Computed hash
+    Replay-->>API: Comparison result
+    API-->>Client: Verification response
