@@ -1,0 +1,8 @@
+{
+  "service": "demo",
+  "artifact_type": "json",
+  "freshness": "now",
+  "evidence": {
+    "path": "demo.json"
+  }
+}
