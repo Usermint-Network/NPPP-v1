@@ -1,1 +1,935 @@
-{"openapi":"3.1.0","info":{"title":"UserMint Notarization API","version":"1.0.0"},"paths":{"/":{"get":{"summary":"Root","operationId":"root__get","responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{}}}}}}},"/health":{"get":{"summary":"Health","operationId":"health_health_get","responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{}}}}}}},"/livez":{"get":{"summary":"Livez","operationId":"livez_livez_get","responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{}}}}}}},"/v1/auth/bootstrap":{"post":{"summary":"Bootstrap","operationId":"bootstrap_v1_auth_bootstrap_post","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/BootstrapRequest"}}},"required":true},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/BootstrapResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/v1/credits/balance":{"get":{"summary":"Balance","operationId":"balance_v1_credits_balance_get","parameters":[{"required":false,"schema":{"type":"string","title":"X-Api-Key"},"name":"x-api-key","in":"header"}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/CreditsBalanceResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/v1/notarize":{"post":{"summary":"Notarize","operationId":"notarize_v1_notarize_post","parameters":[{"required":false,"schema":{"type":"string","title":"X-Api-Key"},"name":"x-api-key","in":"header"}],"requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/NotarizeRequest"}}},"required":true},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/NotarizeResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/v1/verify":{"post":{"summary":"Verify","operationId":"verify_v1_verify_post","requestBody":{"content":{"application/json":{"schema":{"$ref":"#/components/schemas/VerifyRequest"}}},"required":true},"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/VerifyResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}},"/v1/proof/{proof_id}":{"get":{"summary":"Get Proof","operationId":"get_proof_v1_proof__proof_id__get","parameters":[{"required":true,"schema":{"type":"string","title":"Proof Id"},"name":"proof_id","in":"path"}],"responses":{"200":{"description":"Successful Response","content":{"application/json":{"schema":{"$ref":"#/components/schemas/ProofRecordResponse"}}}},"422":{"description":"Validation Error","content":{"application/json":{"schema":{"$ref":"#/components/schemas/HTTPValidationError"}}}}}}}},"components":{"schemas":{"BootstrapRequest":{"properties":{"email":{"type":"string","format":"email","title":"Email"}},"type":"object","required":["email"],"title":"BootstrapRequest"},"BootstrapResponse":{"properties":{"api_key":{"type":"string","title":"Api Key"},"credits":{"type":"integer","title":"Credits"}},"type":"object","required":["api_key","credits"],"title":"BootstrapResponse"},"CreditsBalanceResponse":{"properties":{"credits":{"type":"integer","title":"Credits"}},"type":"object","required":["credits"],"title":"CreditsBalanceResponse"},"DeveloperQuota":{"properties":{"free_remaining":{"type":"integer","title":"Free Remaining"},"billable_rate_usd":{"type":"string","title":"Billable Rate Usd"}},"type":"object","required":["free_remaining","billable_rate_usd"],"title":"DeveloperQuota"},"EvidenceInput":{"properties":{"path":{"type":"string","title":"Path"}},"type":"object","required":["path"],"title":"EvidenceInput"},"HTTPValidationError":{"properties":{"detail":{"items":{"$ref":"#/components/schemas/ValidationError"},"type":"array","title":"Detail"}},"type":"object","title":"HTTPValidationError"},"NotarizeRequest":{"properties":{"service":{"type":"string","title":"Service"},"artifact_type":{"type":"string","title":"Artifact Type"},"freshness":{"type":"string","title":"Freshness"},"evidence":{"$ref":"#/components/schemas/EvidenceInput"}},"type":"object","required":["service","artifact_type","freshness","evidence"],"title":"NotarizeRequest"},"NotarizeResponse":{"properties":{"proof_id":{"type":"string","title":"Proof Id"},"proof":{"type":"string","title":"Proof"},"bundle":{"type":"string","title":"Bundle"},"bundle_sha256":{"type":"string","title":"Bundle Sha256"},"created_at":{"type":"string","title":"Created At"},"developer_quota":{"$ref":"#/components/schemas/DeveloperQuota"}},"type":"object","required":["proof_id","proof","bundle","bundle_sha256","created_at","developer_quota"],"title":"NotarizeResponse"},"ProofRecordResponse":{"properties":{"proof_id":{"type":"string","title":"Proof Id"},"proof":{"type":"string","title":"Proof"},"bundle":{"type":"string","title":"Bundle"},"bundle_sha256":{"type":"string","title":"Bundle Sha256"},"created_at":{"type":"string","title":"Created At"},"service":{"type":"string","title":"Service"},"artifact_type":{"type":"string","title":"Artifact Type"},"freshness":{"type":"string","title":"Freshness"},"verification":{"$ref":"#/components/schemas/VerificationState"}},"type":"object","required":["proof_id","proof","bundle","bundle_sha256","created_at","service","artifact_type","freshness","verification"],"title":"ProofRecordResponse"},"ValidationError":{"properties":{"loc":{"items":{"anyOf":[{"type":"string"},{"type":"integer"}]},"type":"array","title":"Location"},"msg":{"type":"string","title":"Message"},"type":{"type":"string","title":"Error Type"}},"type":"object","required":["loc","msg","type"],"title":"ValidationError"},"VerificationState":{"properties":{"status":{"type":"string","enum":["unverified"],"title":"Status"},"model":{"type":"string","enum":["stateless"],"title":"Model"}},"type":"object","required":["status","model"],"title":"VerificationState"},"VerifyRequest":{"properties":{"proof":{"type":"string","title":"Proof"}},"type":"object","required":["proof"],"title":"VerifyRequest"},"VerifyResponse":{"properties":{"verified":{"type":"boolean","title":"Verified"},"expected_sha256":{"type":"string","title":"Expected Sha256"},"computed_sha256":{"type":"string","title":"Computed Sha256"},"bundle":{"type":"string","title":"Bundle"},"status":{"type":"string","enum":["SHA Replay Verified: OK","SHA Replay Verified: FAILED"],"title":"Status"}},"type":"object","required":["verified","expected_sha256","computed_sha256","bundle","status"],"title":"VerifyResponse"}}}}
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "NPPP v1 Reference API",
+    "version": "1.0.0",
+    "summary": "Reference HTTP binding for the Notarized Proof of Provenance Protocol.",
+    "description": "This OpenAPI document describes a reference HTTP implementation of NPPP v1. The normative protocol definition remains in spec/NPPP_v1.md. This document is non-normative and does not redefine protocol semantics. Authentication, metering, pricing, and access policies are implementation-specific.",
+    "contact": {
+      "name": "UserMint Network",
+      "email": "support@usermint.network"
+    },
+    "license": {
+      "name": "MIT",
+      "identifier": "MIT"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://api.usermint.network",
+      "description": "Reference production API"
+    }
+  ],
+  "tags": [
+    {
+      "name": "system",
+      "description": "Health and root endpoints."
+    },
+    {
+      "name": "auth",
+      "description": "Reference implementation bootstrap and access-related endpoints."
+    },
+    {
+      "name": "credits",
+      "description": "Reference implementation usage balance endpoints."
+    },
+    {
+      "name": "notarization",
+      "description": "Proof creation endpoints."
+    },
+    {
+      "name": "verification",
+      "description": "Replay verification endpoints."
+    },
+    {
+      "name": "proofs",
+      "description": "Proof record retrieval endpoints."
+    }
+  ],
+  "paths": {
+    "/": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "summary": "Root",
+        "description": "Basic reference API root endpoint.",
+        "operationId": "root__get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RootResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/health": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "summary": "Health",
+        "description": "Reference implementation health endpoint.",
+        "operationId": "health_health_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/livez": {
+      "get": {
+        "tags": [
+          "system"
+        ],
+        "summary": "Liveness",
+        "description": "Reference implementation liveness endpoint.",
+        "operationId": "livez_livez_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/auth/bootstrap": {
+      "post": {
+        "tags": [
+          "auth"
+        ],
+        "summary": "Bootstrap",
+        "description": "This is a reference-implementation-specific and non-normative endpoint.",
+        "operationId": "bootstrap_v1_auth_bootstrap_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/BootstrapRequest"
+              },
+              "examples": {
+                "example-1": {
+                  "value": {
+                    "email": "developer@example.com"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BootstrapResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "api_key": "um_1234567890",
+                      "credits": 20
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/credits/balance": {
+      "get": {
+        "tags": [
+          "credits"
+        ],
+        "summary": "Balance",
+        "description": "Metering is implementation-specific.",
+        "operationId": "balance_v1_credits_balance_get",
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CreditsBalanceResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "credits": 100
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": [],
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/notarize": {
+      "post": {
+        "tags": [
+          "notarization"
+        ],
+        "summary": "Notarize",
+        "description": "Creates a proof from a canonicalized evidence bundle using the reference HTTP binding for NPPP v1. This endpoint is implementation-specific and non-normative.",
+        "operationId": "notarize_v1_notarize_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/NotarizeRequest"
+              },
+              "examples": {
+                "example-1": {
+                  "value": {
+                    "service": "example-service",
+                    "artifact_type": "json",
+                    "freshness": "now",
+                    "evidence": {
+                      "path": "bundle/"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotarizeResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "proof_id": "nppp_0f7a14b30117",
+                      "proof": "NPPP:V1|project=<project>|region=<region>|service=example-service|freshness=now|bundle=<bundle_uri>|sha256=<sha256>|created=<timestamp>",
+                      "bundle": "gs://example/bundles/abc.json",
+                      "bundle_sha256": "10fa833533b76d3dcc74b06a07cdf44a778ef799fdfa34b87bc99b2500e7f148",
+                      "created_at": "2026-03-28T05:58:21Z",
+                      "developer_quota": {
+                        "free_remaining": 19,
+                        "billable_rate_usd": "0.10"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Error Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "402": {
+            "description": "Error Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Error Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": [],
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/verify": {
+      "post": {
+        "tags": [
+          "verification"
+        ],
+        "summary": "Verify",
+        "description": "Performs stateless replay verification by retrieving the referenced bundle, recomputing SHA-256, and comparing it to the proof commitment.",
+        "operationId": "verify_v1_verify_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyRequest"
+              },
+              "examples": {
+                "example-1": {
+                  "value": {
+                    "proof": "NPPP:V1|project=<project>|region=<region>|service=example-service|freshness=now|bundle=<bundle_uri>|sha256=<sha256>|created=<timestamp>"
+                  }
+                }
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "verified": true,
+                      "expected_sha256": "10fa833533b76d3dcc74b06a07cdf44a778ef799fdfa34b87bc99b2500e7f148",
+                      "computed_sha256": "10fa833533b76d3dcc74b06a07cdf44a778ef799fdfa34b87bc99b2500e7f148",
+                      "bundle": "gs://example/bundles/abc.json",
+                      "status": "SHA Replay Verified: OK"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Error Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/v1/proof/{proof_id}": {
+      "get": {
+        "tags": [
+          "proofs"
+        ],
+        "summary": "Get Proof",
+        "description": "Retrieves a stored proof record. Proof record retrieval does not itself constitute replay verification.",
+        "operationId": "get_proof_v1_proof__proof_id__get",
+        "parameters": [
+          {
+            "required": true,
+            "schema": {
+              "type": "string",
+              "title": "Proof Id"
+            },
+            "name": "proof_id",
+            "in": "path"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProofRecordResponse"
+                },
+                "examples": {
+                  "success": {
+                    "value": {
+                      "proof_id": "nppp_0f7a14b30117",
+                      "proof": "NPPP:V1|...",
+                      "bundle": "gs://example/bundles/abc.json",
+                      "bundle_sha256": "10fa833533b76d3dcc74b06a07cdf44a778ef799fdfa34b87bc99b2500e7f148",
+                      "created_at": "2026-03-28T05:58:21Z",
+                      "service": "example-service",
+                      "artifact_type": "json",
+                      "freshness": "now",
+                      "verification": {
+                        "status": "unverified",
+                        "model": "stateless"
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Error Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Validation Error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "BootstrapRequest": {
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "title": "Email"
+          }
+        },
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "title": "BootstrapRequest",
+        "examples": [
+          {
+            "email": "developer@example.com"
+          }
+        ]
+      },
+      "BootstrapResponse": {
+        "properties": {
+          "api_key": {
+            "type": "string",
+            "title": "Api Key"
+          },
+          "credits": {
+            "type": "integer",
+            "title": "Credits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "api_key",
+          "credits"
+        ],
+        "title": "BootstrapResponse",
+        "examples": [
+          {
+            "api_key": "um_1234567890",
+            "credits": 20
+          }
+        ]
+      },
+      "CreditsBalanceResponse": {
+        "properties": {
+          "credits": {
+            "type": "integer",
+            "title": "Credits"
+          }
+        },
+        "type": "object",
+        "required": [
+          "credits"
+        ],
+        "title": "CreditsBalanceResponse"
+      },
+      "DeveloperQuota": {
+        "properties": {
+          "free_remaining": {
+            "type": "integer",
+            "title": "Free Remaining"
+          },
+          "billable_rate_usd": {
+            "type": "string",
+            "title": "Billable Rate Usd"
+          }
+        },
+        "type": "object",
+        "required": [
+          "free_remaining",
+          "billable_rate_usd"
+        ],
+        "title": "DeveloperQuota"
+      },
+      "EvidenceInput": {
+        "properties": {
+          "path": {
+            "type": "string",
+            "title": "Path"
+          }
+        },
+        "type": "object",
+        "required": [
+          "path"
+        ],
+        "title": "EvidenceInput"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "type": "array",
+            "title": "Detail"
+          }
+        },
+        "type": "object",
+        "title": "HTTPValidationError"
+      },
+      "NotarizeRequest": {
+        "properties": {
+          "service": {
+            "type": "string",
+            "title": "Service"
+          },
+          "artifact_type": {
+            "type": "string",
+            "title": "Artifact Type"
+          },
+          "freshness": {
+            "type": "string",
+            "title": "Freshness"
+          },
+          "evidence": {
+            "$ref": "#/components/schemas/EvidenceInput"
+          }
+        },
+        "type": "object",
+        "required": [
+          "service",
+          "artifact_type",
+          "freshness",
+          "evidence"
+        ],
+        "title": "NotarizeRequest"
+      },
+      "NotarizeResponse": {
+        "properties": {
+          "proof_id": {
+            "type": "string",
+            "pattern": "^nppp_[A-Za-z0-9_-]+$"
+          },
+          "proof": {
+            "type": "string",
+            "title": "Proof"
+          },
+          "bundle": {
+            "type": "string",
+            "title": "Bundle"
+          },
+          "bundle_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "developer_quota": {
+            "$ref": "#/components/schemas/DeveloperQuota"
+          }
+        },
+        "type": "object",
+        "required": [
+          "proof_id",
+          "proof",
+          "bundle",
+          "bundle_sha256",
+          "created_at",
+          "developer_quota"
+        ],
+        "title": "NotarizeResponse",
+        "examples": [
+          {
+            "proof_id": "nppp_0f7a14b30117",
+            "proof": "NPPP:V1|project=<project>|region=<region>|service=example-service|freshness=now|bundle=<bundle_uri>|sha256=<sha256>|created=<timestamp>",
+            "bundle": "gs://example/bundles/abc.json",
+            "bundle_sha256": "10fa833533b76d3dcc74b06a07cdf44a778ef799fdfa34b87bc99b2500e7f148",
+            "created_at": "2026-03-28T05:58:21Z",
+            "developer_quota": {
+              "free_remaining": 19,
+              "billable_rate_usd": "0.10"
+            }
+          }
+        ]
+      },
+      "ProofRecordResponse": {
+        "properties": {
+          "proof_id": {
+            "type": "string",
+            "pattern": "^nppp_[A-Za-z0-9_-]+$"
+          },
+          "proof": {
+            "type": "string",
+            "title": "Proof"
+          },
+          "bundle": {
+            "type": "string",
+            "title": "Bundle"
+          },
+          "bundle_sha256": {
+            "type": "string",
+            "pattern": "^[a-f0-9]{64}$"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "service": {
+            "type": "string",
+            "title": "Service"
+          },
+          "artifact_type": {
+            "type": "string",
+            "title": "Artifact Type"
+          },
+          "freshness": {
+            "type": "string",
+            "title": "Freshness"
+          },
+          "verification": {
+            "$ref": "#/components/schemas/VerificationState"
+          }
+        },
+        "type": "object",
+        "required": [
+          "proof_id",
+          "proof",
+          "bundle",
+          "bundle_sha256",
+          "created_at",
+          "service",
+          "artifact_type",
+          "freshness",
+          "verification"
+        ],
+        "title": "ProofRecordResponse",
+        "examples": [
+          {
+            "proof_id": "nppp_0f7a14b30117",
+            "proof": "NPPP:V1|...",
+            "bundle": "gs://example/bundles/abc.json",
+            "bundle_sha256": "10fa833533b76d3dcc74b06a07cdf44a778ef799fdfa34b87bc99b2500e7f148",
+            "created_at": "2026-03-28T05:58:21Z",
+            "service": "example-service",
+            "artifact_type": "json",
+            "freshness": "now",
+            "verification": {
+              "status": "unverified",
+              "model": "stateless"
+            }
+          }
+        ]
+      },
+      "ValidationError": {
+        "properties": {
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "type": "array",
+            "title": "Location"
+          },
+          "msg": {
+            "type": "string",
+            "title": "Message"
+          },
+          "type": {
+            "type": "string",
+            "title": "Error Type"
+          }
+        },
+        "type": "object",
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError"
+      },
+      "VerificationState": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "unverified"
+            ]
+          },
+          "model": {
+            "type": "string",
+            "enum": [
+              "stateless"
+            ]
+          }
+        },
+        "required": [
+          "status",
+          "model"
+        ]
+      },
+      "VerifyRequest": {
+        "properties": {
+          "proof": {
+            "type": "string",
+            "title": "Proof"
+          }
+        },
+        "type": "object",
+        "required": [
+          "proof"
+        ],
+        "title": "VerifyRequest"
+      },
+      "VerifyResponse": {
+        "properties": {
+          "verified": {
+            "type": "boolean",
+            "title": "Verified"
+          },
+          "expected_sha256": {
+            "type": "string",
+            "title": "Expected Sha256"
+          },
+          "computed_sha256": {
+            "type": "string",
+            "title": "Computed Sha256"
+          },
+          "bundle": {
+            "type": "string",
+            "title": "Bundle"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "SHA Replay Verified: OK",
+              "SHA Replay Verified: FAILED"
+            ],
+            "title": "Status"
+          }
+        },
+        "type": "object",
+        "required": [
+          "verified",
+          "expected_sha256",
+          "computed_sha256",
+          "bundle",
+          "status"
+        ],
+        "title": "VerifyResponse",
+        "examples": [
+          {
+            "verified": true,
+            "expected_sha256": "10fa833533b76d3dcc74b06a07cdf44a778ef799fdfa34b87bc99b2500e7f148",
+            "computed_sha256": "10fa833533b76d3dcc74b06a07cdf44a778ef799fdfa34b87bc99b2500e7f148",
+            "bundle": "gs://example/bundles/abc.json",
+            "status": "SHA Replay Verified: OK"
+          }
+        ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "error": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "error",
+          "message"
+        ]
+      },
+      "RootResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "message"
+        ],
+        "title": "RootResponse"
+      },
+      "HealthResponse": {
+        "type": "object",
+        "properties": {
+          "status": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "status"
+        ],
+        "title": "HealthResponse"
+      }
+    },
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Reference implementation outer access credential. Non-normative and implementation-specific."
+      },
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "X-API-Key",
+        "description": "Reference implementation metering key for selected operations. Non-normative and implementation-specific."
+      }
+    }
+  }
+}
