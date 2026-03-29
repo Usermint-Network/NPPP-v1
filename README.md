@@ -2,6 +2,12 @@
 
 **Deterministic proof. Stateless verification. Minimal trust.**
 
+## Latest Release
+
+NPPP v1.0.0 is available:
+
+https://github.com/Usermint-Network/NPPP-v1/releases/tag/v1.0.0
+
 ## What Is NPPP?
 
 NPPP v1 is a stateless integrity protocol for issuing and verifying deterministic cryptographic proofs of data.
