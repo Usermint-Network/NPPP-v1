@@ -233,6 +233,8 @@ YYYY-MM-DDTHH:MM:SSZ
 
 ## 8. Canonical Bundle Requirement
 A conforming implementation MUST persist or otherwise reference a canonical bundle whose byte sequence is the source of the proof’s SHA-256 commitment.
+
+The SHA-256 input MUST be exactly the canonicalized bundle byte sequence, with no additional framing, encoding, or transformation.
 The protocol requires that:
 ```plain text
 sha256(bundle_bytes) == proof.sha256
@@ -267,10 +269,14 @@ A conforming implementation MUST serialize bundle data using a deterministic can
 For JSON-based artifacts, the following rules MUST apply:
 
 - Encoding MUST be UTF-8
-- Object keys MUST be sorted lexicographically
+- Object keys MUST be sorted lexicographically using a deterministic ordering
 - No insignificant whitespace is permitted
 - Numbers MUST use canonical JSON representation
 - Strings MUST be encoded without normalization changes
+
+Binary artifacts SHOULD be included as-is unless a canonical binary normalization is explicitly defined.
+
+If binary normalization is applied, it MUST be deterministic and reproducible across implementations.
 
 The resulting byte sequence MUST be identical for identical logical input.
 
@@ -308,6 +314,11 @@ A conforming implementation MUST perform the following logical steps during nota
 ### 9.1 Determinism Requirement
 The serialization used to derive the bundle hash MUST be deterministic.
 If the same canonical input produces different bundle bytes across implementations or executions, the implementation is not conforming.
+
+Determinism is defined at the boundary of the canonicalized bundle bytes.
+
+Any transformation applied prior to canonicalization is outside the scope of NPPP v1,
+but the resulting canonicalized byte sequence MUST be stable and reproducible.
 
 ---
 
@@ -485,6 +496,8 @@ It is not a protocol for:
 - legal truth,
 - decentralized settlement.
 
+Canonicalization reduces ambiguity in input representation but does not protect against maliciously crafted inputs that are intentionally identical at the byte level.
+
 ---
 
 ## 18. Trust Boundary Summary
@@ -566,6 +579,8 @@ Any change to:
 - verification result vocabulary,
 - verification object semantics,
 SHOULD be treated as a versioned protocol change.
+
+Independent implementations that conform to these canonicalization rules SHOULD produce identical bundle bytes for identical logical inputs, enabling cross-system verification interoperability.
 
 ---
 

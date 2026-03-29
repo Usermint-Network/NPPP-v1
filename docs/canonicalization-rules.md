@@ -1,32 +1,34 @@
-# NPPP Canonicalization Rules
+# NPPP v1 Canonicalization Rules
 
-This document defines the canonicalization principles for **NPPP v1**.
+## Status of This Document
 
-Canonicalization is the process of transforming notarization inputs into a stable representation so that identical logical artifacts produce identical evidence bundles.
+This document defines the canonicalization profile used to satisfy the deterministic bundle requirements of NPPP v1.
 
----
+The normative protocol definition remains:
+
+- `spec/NPPP_v1.md`
+
+If this document conflicts with the normative specification, the specification governs.
+
+This document operationalizes the deterministic serialization requirements defined in Section 8 of the NPPP v1 specification.
 
 ## Purpose
 
 Canonicalization exists to guarantee determinism.
 
-Without canonicalization, semantically identical artifacts may produce different bytes, causing verification failures even when the underlying evidence has not meaningfully changed.
-
----
+Without canonicalization, semantically identical artifacts may produce different bundle bytes, causing divergent SHA-256 commitments and unreliable replay verification.
 
 ## Canonicalization Goal
 
 The goal of canonicalization is:
 
-> identical inputs should produce identical bundle bytes
+> identical logical inputs should produce identical bundle bytes
 
-This is required for replay verification to function reliably.
+This property is required for replay verification to function reliably.
 
----
+## Scope
 
-## Canonicalization Scope
-
-Canonicalization applies to any input that influences the final evidence bundle, including:
+Canonicalization applies to any input that influences the final serialized bundle bytes, including:
 
 - files
 - metadata
@@ -34,30 +36,49 @@ Canonicalization applies to any input that influences the final evidence bundle,
 - service-generated context
 - archive ordering
 
----
+## Required Canonical Properties
 
-## Core Rules
+The following properties are required for a conforming NPPP v1 implementation:
 
-NPPP v1 canonicalization **MUST** enforce the following principles to guarantee byte-for-byte deterministic output.
+1.  textual data MUST use UTF-8 encoding
+2.  structured data MUST be serialized deterministically
+3.  file ordering MUST be deterministic and stable
+4.  incidental timestamps MUST NOT affect bundle bytes
+5.  identical logical inputs MUST yield identical bundle bytes
 
-### 1. Character Encoding
-- **Text:** All textual data, including file contents, metadata, and structured data, **MUST** be encoded as **UTF-8**. No other text encodings are permitted.
+This requirement applies to the exact byte sequence used as input to SHA-256.
 
-### 2. JSON Serialization
-- **Deterministic Serialization:** All structured metadata represented as JSON **MUST** be serialized deterministically.
-- **Stable Key Ordering:** JSON object keys **MUST** be sorted lexicographically (by Unicode code point) before serialization.
-- **Whitespace Rules:** JSON output **MUST** be compact, with no insignificant whitespace (e.g., newlines or spaces between keys, values, and separators). The output should be a single line.
-- **Example:** A JSON object `{"c": 3, "a": 1, "b": 2}` MUST be serialized as `{"a":1,"b":2,"c":3}`.
+Determinism is defined at the boundary of the canonicalized bundle bytes.
 
-### 3. File and Directory Ordering
-- **Stable File Ordering:** Files included in an evidence bundle **MUST** be ordered deterministically. The required method is a simple lexicographical sort of their full path strings.
-- **Stable Directory Layout:** The directory structure within any archive (e.g., `.tar.gz`) **MUST** be consistent across all runs for the same logical input.
+Any transformation applied prior to canonicalization is outside the scope of NPPP v1,
+but the resulting canonicalized byte sequence MUST be stable and reproducible.
 
-### 4. Timestamps
-- **Intentional Timestamps Only:** Only timestamps that are an explicit part of the notarized evidence may be included. Incidental timestamps (e.g., file access times, archive creation times) **MUST NOT** be included in the data used to generate the bundle hash.
+## Deterministic Implementation Strategies (Non-Normative)
 
-### 5. Archive Generation
-- **Deterministic Archives:** If an archive format (like TAR) is used to create the bundle, its generation **MUST** be deterministic. This means identical inputs must produce identical archive bytes. Tools and flags should be chosen to support this (e.g., `tar --sort=name`).
+The following strategies are recommended for achieving the required canonical properties:
+
+### 1. JSON Serialization
+
+-   object keys MUST be sorted lexicographically using a deterministic ordering
+-   remove insignificant whitespace
+-   use a single-line compact representation
+
+Example:
+
+```json
+{"a":1,"b":2,"c":3}
+```
+
+### 2. File and Directory Ordering
+
+-   sort files by stable full path
+-   preserve a deterministic directory layout
+
+### 3. Archive Generation
+
+-   archive generation MUST be deterministic if archives are used as bundle containers
+-   eliminate archive timestamps not intended as notarized evidence
+-   choose tooling and flags that preserve stable output
 
 ---
 
@@ -77,13 +98,17 @@ Examples of consistency include:
 - stable object key ordering
 - normalized whitespace
 - consistent numeric representation where relevant
-The exact encoding strategy may vary by implementation, but the result MUST remain deterministic.
+
+The exact encoding strategy may vary by implementation, but the resulting bundle bytes MUST remain deterministic.
 
 ---
 
 ## Canonicalization of Binary Artifacts
-Binary artifacts SHOULD be included as-is unless the protocol or application explicitly defines a canonical binary normalization process.
-The key requirement is that the bytes included in the bundle remain stable and intentional.
+Binary artifacts SHOULD be included as-is unless a canonical binary normalization is explicitly defined.
+
+If binary normalization is applied, it MUST be deterministic and reproducible across implementations.
+
+The key requirement is that the byte sequence included in the bundle remains stable and intentional.
 
 ---
 
@@ -92,26 +117,43 @@ Canonicalization precedes hashing.
 The canonicalized inputs are assembled into the evidence bundle, and the final serialized bundle is hashed using SHA-256.
 If canonicalization is inconsistent, bundle hashes will diverge.
 
----
+The SHA-256 commitment in the proof is computed over the fully canonicalized bundle bytes.
 
-## Failure Mode
+The SHA-256 input MUST be exactly the canonicalized bundle byte sequence, with no additional framing, encoding, or transformation.
+
+## Failure Consequences
+
 If identical logical artifacts do not produce identical bundle bytes, then:
-- the resulting proof hashes may differ
-- replay verification may fail unexpectedly
-- the notarization process loses determinism
+
+-   independent verifiers may produce inconsistent results for the same proof
+-   proof hashes may diverge
+-   replay verification may fail unexpectedly
+-   interoperability between implementations may degrade
+-   the notarization process loses determinism
 
 For this reason, canonicalization is not optional in NPPP v1 systems.
 
----
+## Trust Interpretation
 
-## Canonicalization and Trust
-Canonicalization does not make evidence true.
-It makes evidence stable.
-This distinction is critical.
-NPPP relies on canonicalization to ensure that cryptographic verification is meaningful across repeated verification attempts.
+Canonicalization does not make evidence true or trustworthy.
+
+Canonicalization makes evidence stable enough to support deterministic hashing and reproducible replay verification.
+
+NPPP relies on canonicalization to ensure that cryptographic verification remains meaningful across repeated verification attempts.
+
+Canonicalization reduces ambiguity in input representation but does not protect against maliciously crafted inputs that are intentionally identical at the byte level.
 
 ---
 
 ## Versioning
 These rules define canonicalization expectations for NPPP v1.
 Future protocol versions may introduce stricter normalization requirements, artifact-specific canonical forms, or mandatory serialization standards.
+
+Canonicalization is a prerequisite for interoperability across independent NPPP implementations.
+
+Independent implementations that conform to these canonicalization rules SHOULD produce identical bundle bytes for identical logical inputs, enabling cross-system verification interoperability.
+
+See also:
+- spec/NPPP_v1.md (normative protocol definition)
+- docs/bundle-structure.md (bundle construction model)
+
