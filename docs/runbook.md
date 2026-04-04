@@ -22,7 +22,7 @@ For normative protocol behavior, see `spec/NPPP_v1.md`.
 ## Reference Deployment Base URL
 
 ```text
-https://api.usermint.network
+https://api.usermintnetwork.com
 ```
 
 If using the direct service URL for the current deployment, substitute accordingly.
@@ -41,12 +41,9 @@ These are reference deployment concerns, not protocol requirements.
 ```http
 Authorization: Bearer <PLATFORM_ACCESS_TOKEN>
 ```
-
-### Metering Header
-
-```http
-X-API-Key: <USERMINT_API_KEY>
-```
+> Status Note:
+> This runbook describes a reference deployment model for NPPP v1.
+> Public hosted endpoint availability and exact route behavior are implementation-specific and may change as the reference implementation is aligned to the protocol contract.
 
 ## Step 1 — Acquire Outer Access Credential
 
@@ -65,7 +62,7 @@ BOOTSTRAP_RESP=$(curl -s -X POST
   -H "Authorization: Bearer $TOKEN" 
   -H "Content-Type: application/json" 
   -d '{"email":"launch@usermintnetwork.com"}' 
-  https://api.usermint.network/v1/auth/bootstrap)
+  https://api.usermintnetwork.com/v1/auth/bootstrap)
 
 echo "$BOOTSTRAP_RESP"
 ```
@@ -73,7 +70,6 @@ echo "$BOOTSTRAP_RESP"
 **Expected**:
 
 - API key returned
-- initial credits returned
 
 ## Step 3 — Extract API Key
 
@@ -82,21 +78,7 @@ API_KEY=$(printf '%s' "$BOOTSTRAP_RESP" | python3 -c 'import sys,json; print(jso
 echo "$API_KEY"
 ```
 
-## Step 4 — Check Credits Before Notarization
-
-```bash
-curl -i 
-  -H "Authorization: Bearer $TOKEN" 
-  -H "X-API-Key: $API_KEY" 
-  https://api.usermint.network/v1/credits/balance
-```
-
-**Expected**:
-
-- `HTTP 200`
-- positive credits balance
-
-## Step 5 — Submit Notarization Request
+## Step 4 — Submit Notarization Request
 
 ```bash
 NOTARIZE_RESP=$(curl -s -X POST 
@@ -109,7 +91,7 @@ NOTARIZE_RESP=$(curl -s -X POST
     "freshness":"now",
     "evidence":{"path":"demo.json"}
   }' 
-  https://api.usermint.network/v1/notarize)
+  https://api.usermintnetwork.com/v1/notarize)
 
 echo "$NOTARIZE_RESP"
 ```
@@ -121,7 +103,6 @@ echo "$NOTARIZE_RESP"
 - `bundle`
 - `bundle_sha256`
 - `created_at`
-- developer quota information
 
 ## Step 6 — Extract Proof and Proof ID
 
@@ -140,7 +121,7 @@ curl -i -X POST
   -H "Authorization: Bearer $TOKEN" 
   -H "Content-Type: application/json" 
   -d "{"proof":"$PROOF"}" 
-  https://api.usermint.network/v1/verify
+  https://api.usermintnetwork.com/v1/verify
 ```
 
 **Expected**:
@@ -154,7 +135,7 @@ curl -i -X POST
 ```bash
 curl -i 
   -H "Authorization: Bearer $TOKEN" 
-  "https://api.usermint.network/v1/proof/$PROOF_ID"
+  "https://api.usermintnetwork.com/v1/proof/$PROOF_ID"
 ```
 
 **Expected**:
@@ -166,20 +147,6 @@ curl -i
   - `verification.model = "stateless"`
 
 This does not contradict successful replay verification. It reflects the stateless verification model.
-
-## Step 9 — Check Credits After Notarization
-
-```bash
-curl -i 
-  -H "Authorization: Bearer $TOKEN" 
-  -H "X-API-Key: $API_KEY" 
-  https://api.usermint.network/v1/credits/balance
-```
-
-**Expected**:
-
-- `HTTP 200`
-- credits reduced appropriately
 
 ## Success Criteria
 

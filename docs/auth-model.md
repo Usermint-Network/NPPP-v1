@@ -98,7 +98,6 @@ Example response:
 
 The current reference deployment expects `X-API-Key` for:
 
-- `GET /v1/credits/balance`
 - `POST /v1/notarize`
 
 ### Non-Metered Operations
